@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BillBook SaaS - GST Invoicing, Inventory & Subscriptions</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">B</div>
+      <div class="brand-text">
+        <h2>BillBook SaaS</h2>
+        <span>GST Billing & Cloud</span>
+      </div>
+    </div>
+
+    <!-- Active Subscription Banner -->
+    <div class="sidebar-subscription-badge">
+      <div class="badge-info">
+        <h4 id="sidebarSubPlan">Pro Max Plan</h4>
+        <p id="sidebarSubExpiry">Active Subscription</p>
+      </div>
+      <a href="#" class="btn btn-sm btn-secondary" onclick="window.App.switchTab('subscription'); return false;" style="padding: 2px 8px; font-size: 0.7rem;">Manage</a>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="nav-item">
+        <a class="nav-link active" data-tab="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-tab="pos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          POS Counter
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-tab="invoices">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          Sales Invoices
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-tab="items">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          Items & Inventory
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-tab="parties">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          Parties (Ledger)
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-tab="purchases">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+          Purchases
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-tab="reports">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          GST Reports
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-tab="subscription">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          Subscription & Plans
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-tab="settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          Business Profile
+        </a>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <span>UPI: joy.john@ybl</span>
+      <span>v2.4.0</span>
+    </div>
+  </aside>
+
+  <!-- Main Wrapper -->
+  <main class="main-wrapper">
+    <!-- Header -->
+    <header class="top-header no-print">
+      <div class="header-left">
+        <div class="business-selector">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <span id="headerBizName">ADONAI ENTERPRISES</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="sync-status" id="cloudSyncPill">
+          <div class="sync-pulse"></div>
+          <span id="cloudSyncText">Firebase Synced</span>
+        </div>
+        <button class="btn btn-outline btn-sm" id="btnForceSync">Sync Cloud</button>
+        <button class="btn btn-primary btn-sm" onclick="window.App.switchTab('pos')">⚡ Quick POS</button>
+      </div>
+    </header>
+
+    <!-- Body Content -->
+    <div class="content-body">
+
+      <!-- TAB: DASHBOARD -->
+      <section class="tab-pane active" id="tab-dashboard">
+        <div class="page-header-row">
+          <div class="page-title">
+            <h1>Business Overview</h1>
+            <p>Real-time billing, revenue, and inventory insights</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" onclick="window.App.switchTab('pos')">+ Quick Sale</button>
+            <button class="btn btn-outline" onclick="window.App.switchTab('invoices')">All Invoices</button>
+          </div>
+        </div>
+
+        <!-- Key Metrics Grid -->
+        <div class="stats-grid">
+          <div class="stat-card sales">
+            <div class="stat-title">Total Sales</div>
+            <div class="stat-value" id="statTotalSales">₹0.00</div>
+            <div class="stat-sub">Across all registered bills</div>
+          </div>
+          <div class="stat-card receivable">
+            <div class="stat-title">You'll Get (Receivables)</div>
+            <div class="stat-value" id="statToCollect">₹0.00</div>
+            <div class="stat-sub">Pending customer collections</div>
+          </div>
+          <div class="stat-card payable">
+            <div class="stat-title">You'll Give (Payables)</div>
+            <div class="stat-value" id="statToPay">₹0.00</div>
+            <div class="stat-sub">Vendor purchase dues</div>
+          </div>
+          <div class="stat-card cash">
+            <div class="stat-title">Cash & Bank Balance</div>
+            <div class="stat-value" id="statCashBank">₹0.00</div>
+            <div class="stat-sub">Liquid funds available</div>
+          </div>
+        </div>
+
+        <!-- Low Stock Alert Banner -->
+        <div style="background: var(--warning-light); border: 1px solid #fde047; border-radius: 8px; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ca8a04" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <div>
+              <strong style="color: #854d0e;">Stock Alerts:</strong>
+              <span style="color: #713f12; margin-left: 4px;">You have <strong id="statLowStockCount">0</strong> item(s) running below minimum threshold level.</span>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-outline" style="border-color: #ca8a04; color: #854d0e;" onclick="window.App.switchTab('items')">Inspect Stock</button>
+        </div>
+
+        <!-- Recent Invoices Table -->
+        <div class="table-card">
+          <div class="table-toolbar">
+            <h3 style="font-size: 1rem; font-weight: 700;">Recent Sales Invoices</h3>
+            <button class="btn btn-sm btn-outline" onclick="window.App.switchTab('invoices')">View All</button>
+          </div>
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th>Customer Name</th>
+                <th>Date</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="recentInvoicesTbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB: POS COUNTER -->
+      <section class="tab-pane" id="tab-pos">
+        <div class="page-header-row">
+          <div class="page-title">
+            <h1>Quick POS Retail Counter</h1>
+            <p>Fast-track barcode scanning & thermal receipt billing</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-outline" onclick="window.App.switchTab('invoices')">View All Sales</button>
+          </div>
+        </div>
+
+        <div class="pos-container">
+          <!-- Item Grid -->
+          <div class="pos-catalog">
+            <div style="font-weight: 700; margin-bottom: 0.5rem;">Select Products (Click to Add)</div>
+            <div class="item-grid" id="posItemGrid"></div>
+          </div>
+
+          <!-- Live Cart -->
+          <div class="pos-cart">
+            <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); background: #f8fafc; font-weight: 700;">
+              Checkout Cart
+            </div>
+            <div class="cart-items" id="posCartItems"></div>
+            <div class="cart-totals">
+              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px;">
+                <span>Subtotal:</span>
+                <span id="posSubtotal">₹0.00</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px;">
+                <span>GST Tax:</span>
+                <span id="posTax">₹0.00</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: 800; border-top: 1px solid var(--border); padding-top: 8px; margin-bottom: 12px; color: var(--primary);">
+                <span>Grand Total:</span>
+                <span id="posGrandTotal">₹0.00</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <button class="btn btn-secondary" onclick="window.App.checkoutPOS('Cash')">💵 Cash Bill</button>
+                <button class="btn btn-primary" onclick="window.App.checkoutPOS('UPI')">📱 UPI Bill</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: INVOICES -->
+      <section class="tab-pane" id="tab-invoices">
+        <div class="page-header-row">
+          <div class="page-title">
+            <h1>Sales Invoices</h1>
+            <p>Full GST compliant B2B & B2C tax invoices</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" onclick="window.App.switchTab('pos')">+ New Bill (POS)</button>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Paid</th>
+                <th>Balance</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="invoicesTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB: ITEMS (INVENTORY) -->
+      <section class="tab-pane" id="tab-items">
+        <div class="page-header-row">
+          <div class="page-title">
+            <h1>Items & Stock Inventory</h1>
+            <p>SKU, HSN/SAC codes, barcodes, and stock levels</p>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Item Name & Code</th>
+                <th>Category</th>
+                <th>HSN</th>
+                <th>Sale Price</th>
+                <th>Cost Price</th>
+                <th>Current Stock</th>
+                <th>GST Rate</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="itemsTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB: PARTIES -->
+      <section class="tab-pane" id="tab-parties">
+        <div class="page-header-row">
+          <div class="page-title">
+            <h1>Parties (Customers & Vendors)</h1>
+            <p>Customer ledger balances and payment reminders</p>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Party Name</th>
+                <th>Type</th>
+                <th>GSTIN</th>
+                <th>State</th>
+                <th>Current Balance</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="partiesTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB: PURCHASES -->
+      <section class="tab-pane" id="tab-purchases">
+        <div class="page-header-row">
+          <div class="page-title">
+            <h1>Purchases & Vendor Bills</h1>
+            <p>Inward stock and supplier purchase bills</p>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Bill #</th>
+                <th>Date</th>
+                <th>Supplier / Vendor</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Payment Mode</th>
+              </tr>
+            </thead>
+            <tbody id="purchasesTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB: REPORTS -->
+      <section class="tab-pane" id="tab-reports">
+        <div class="page-header-row">
+          <div class="page-title">
+            <h1>GST & Financial Reports</h1>
+            <p>GSTR-1, Tax summaries, and business performance</p>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card sales">
+            <div class="stat-title">B2B Taxable Sales</div>
+            <div class="stat-value" id="repB2bTaxable">₹0.00</div>
+            <div class="stat-sub">Registered GST parties</div>
+          </div>
+          <div class="stat-card receivable">
+            <div class="stat-title">B2B GST Tax Collected</div>
+            <div class="stat-value" id="repB2bTax">₹0.00</div>
+            <div class="stat-sub">CGST + SGST + IGST</div>
+          </div>
+          <div class="stat-card cash">
+            <div class="stat-title">B2C Retail Sales</div>
+            <div class="stat-value" id="repB2cTaxable">₹0.00</div>
+            <div class="stat-sub">Unregistered consumer sales</div>
+          </div>
+          <div class="stat-card payable">
+            <div class="stat-title">Total Tax Collected</div>
+            <div class="stat-value" id="repTotalTax">₹0.00</div>
+            <div class="stat-sub">Ready for GSTR-1 & 3B filing</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: SUBSCRIPTION & PLANS -->
+      <section class="tab-pane" id="tab-subscription">
+        <div class="page-header-row">
+          <div class="page-title">
+            <h1>Subscription Plans & Billing</h1>
+            <p>Choose the right plan for your business needs</p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.75rem; background: #ffffff; padding: 0.4rem 0.8rem; border-radius: 20px; border: 1px solid var(--border);">
+            <span style="font-size: 0.85rem; font-weight: 600;">Monthly</span>
+            <label style="position: relative; display: inline-block; width: 44px; height: 24px;">
+              <input type="checkbox" id="pricingCycleToggle" checked style="opacity: 0; width: 0; height: 0;">
+              <span style="position: absolute; cursor: pointer; inset: 0; background-color: var(--primary); border-radius: 24px; transition: 0.3s;"></span>
+            </label>
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--primary);">Yearly (Up to 20% OFF)</span>
+          </div>
+        </div>
+
+        <!-- Pricing Cards -->
+        <div class="pricing-grid" id="subscriptionPlansContainer"></div>
+      </section>
+
+      <!-- TAB: SETTINGS -->
+      <section class="tab-pane" id="tab-settings">
+        <div class="page-header-row">
+          <div class="page-title">
+            <h1>Business Profile & Payment Settings</h1>
+            <p>Company details printed on your GST invoices & UPI QR</p>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-primary" onclick="window.App.saveSettings()">Save Changes</button>
+          </div>
+        </div>
+
+        <div class="table-card" style="padding: 1.5rem;">
+          <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Company Information</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Business / Company Name</label>
+              <input type="text" class="form-control" id="setBizName">
+            </div>
+            <div class="form-group">
+              <label>GSTIN Number</label>
+              <input type="text" class="form-control" id="setGstin">
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="text" class="form-control" id="setPhone">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Official Email</label>
+              <input type="email" class="form-control" id="setEmail">
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
+              <label>Business Address</label>
+              <input type="text" class="form-control" id="setAddress">
+            </div>
+          </div>
+
+          <h3 style="font-size: 1.1rem; margin: 1.5rem 0 1rem;">Bank & UPI Payment Gateway</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>UPI ID (For Invoice QR Codes)</label>
+              <input type="text" class="form-control" id="setUpiId" placeholder="e.g. joy.john@ybl">
+            </div>
+            <div class="form-group">
+              <label>Bank Name</label>
+              <input type="text" class="form-control" id="setBankName">
+            </div>
+            <div class="form-group">
+              <label>Account Number</label>
+              <input type="text" class="form-control" id="setAccountNo">
+            </div>
+            <div class="form-group">
+              <label>IFSC Code</label>
+              <input type="text" class="form-control" id="setIfsc">
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+</div>
+
+<!-- Modal: Invoice View & Print Preview -->
+<div class="modal-overlay" id="invoiceViewModal">
+  <div class="modal-box" style="max-width: 860px;">
+    <div class="modal-header no-print">
+      <h3>Tax Invoice Preview</h3>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <button class="btn btn-sm btn-primary" onclick="window.print()">🖨️ Print / Save PDF</button>
+        <button class="modal-close">&times;</button>
+      </div>
+    </div>
+    <div class="modal-body print-surface" id="invoicePrintPreview" style="background: #f1f5f9; padding: 1.5rem;"></div>
+  </div>
+</div>
+
+<!-- Modal: Subscription Plan Upgrade -->
+<div class="modal-overlay" id="upgradeModal">
+  <div class="modal-box" style="max-width: 520px;">
+    <div class="modal-header">
+      <h3>Upgrade Subscription</h3>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body" id="upgradeModalBody"></div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="js/cloud-sync.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "rules": {
+    "billbook": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      "businesses": {
+        "$businessId": {
+          ".read": "auth != null || query.orderByChild == 'publicInvoice'",
+          ".write": "auth != null"
+        }
+      },
+      "public_invoices": {
+        "$invoiceId": {
+          ".read": true,
+          ".write": "auth != null"
+        }
+      }
+    }
+  }
+}
