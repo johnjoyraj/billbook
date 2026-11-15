@@ -9,7 +9,6 @@ import socketserver
 import os
 import sys
 import json
-import webbrowser
 import urllib.request
 import urllib.error
 
@@ -19,9 +18,6 @@ FIREBASE_URL = "https://adonaibroadcast-11095.firebaseio.com/billbook.json"
 DATA_FILE = os.path.join(DIRECTORY, "seed_data.json")
 
 class BillBookHandler(http.server.SimpleHTTPRequestHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory=DIRECTORY, **kwargs)
-
     def end_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
@@ -48,7 +44,6 @@ class BillBookHandler(http.server.SimpleHTTPRequestHandler):
                 )
                 try:
                     with urllib.request.urlopen(req, timeout=10) as res:
-                        fb_response = res.read().decode('utf-8')
                         self.send_response(200)
                         self.send_header("Content-Type", "application/json")
                         self.end_headers()
@@ -86,25 +81,26 @@ class BillBookHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({"error": str(e)}).encode('utf-8'))
                 return
 
-        self.send_response(404)
-        self.end_headers()
+        return super().do_GET()
 
-def start_server(port=PORT):
-    for p in range(port, port + 10):
+def start_server():
+    os.chdir(DIRECTORY)
+    socketserver.TCPServer.allow_reuse_address = True
+    for p in range(PORT, PORT + 10):
         try:
-            handler = BillBookHandler
-            with socketserver.TCPServer(("", p), handler) as httpd:
+            with socketserver.TCPServer(("", p), BillBookHandler) as httpd:
                 print("=" * 65)
                 print("  BillBook SaaS - GST Invoicing & Billing Platform")
-                print(f"  Server URL: http://localhost:{p}")
-                print(f"  Firebase:   https://adonaibroadcast-11095.firebaseio.com/billbook")
+                print(f"  Server URL:  http://localhost:{p}")
+                print(f"  Firebase:    https://adonaibroadcast-11095.firebaseio.com/billbook")
                 print(f"  UPI Gateway: joy.john@ybl (Joy John)")
                 print("=" * 65)
-                webbrowser.open(f"http://localhost:{p}")
+                sys.stdout.flush()
                 httpd.serve_forever()
                 break
         except OSError:
             print(f"Port {p} is in use, trying {p+1}...")
+            sys.stdout.flush()
 
 if __name__ == "__main__":
     start_server()

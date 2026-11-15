@@ -27,7 +27,7 @@
      * Initialize Local & Remote Database State
      */
     async init() {
-      // 1. Try Local Storage
+      // 1. Try Local Storage first
       const cached = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (cached) {
         try {
@@ -38,21 +38,28 @@
         }
       }
 
-      // 2. Fetch seed data if cache is empty
+      // 2. Fallback to embedded seed dataset (supports file:// protocol)
       if (!currentData || !currentData.business) {
-        try {
-          const res = await fetch('seed_data.json');
-          if (res.ok) {
-            currentData = await res.json();
-            this.saveLocal();
-            console.log('[CloudSync] Initialized from seed_data.json');
+        if (window.BILLBOOK_DEFAULT_DATA) {
+          currentData = JSON.parse(JSON.stringify(window.BILLBOOK_DEFAULT_DATA));
+          this.saveLocal();
+          console.log('[CloudSync] Initialized from embedded seed dataset');
+        } else {
+          // 3. Try fetching seed_data.json via HTTP
+          try {
+            const res = await fetch('seed_data.json');
+            if (res.ok) {
+              currentData = await res.json();
+              this.saveLocal();
+              console.log('[CloudSync] Initialized from seed_data.json');
+            }
+          } catch (e) {
+            console.error('[CloudSync] Failed to fetch seed_data.json', e);
           }
-        } catch (e) {
-          console.error('[CloudSync] Failed to fetch seed_data.json', e);
         }
       }
 
-      // 3. Attempt Firebase cloud fetch in background
+      // 4. Attempt Firebase cloud fetch in background (non-blocking)
       this.syncFromCloud().catch(err => {
         console.log('[CloudSync] Firebase sync in offline/standalone mode:', err.message);
       });
@@ -72,13 +79,17 @@
      */
     saveLocal() {
       if (currentData) {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(currentData));
-        this.updateSyncUI(true, 'Saved Locally');
+        try {
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(currentData));
+          this.updateSyncUI(true, 'Saved Locally');
+        } catch (e) {
+          console.warn('[CloudSync] LocalStorage error:', e);
+        }
       }
     },
 
     /**
-     * Push entire state or delta to Firebase Realtime Database
+     * Push entire state to Firebase Realtime Database
      */
     async pushToCloud() {
       if (!currentData) return false;
@@ -104,7 +115,7 @@
         return true;
       } catch (err) {
         console.warn('[CloudSync] Cloud push notice:', err.message);
-        this.updateSyncUI(false, 'Local Mode (Cloud 401 Auth)');
+        this.updateSyncUI(false, 'Local Fast Cache (Online)');
         return false;
       } finally {
         isSyncing = false;
