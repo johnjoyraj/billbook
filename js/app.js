@@ -450,11 +450,15 @@
       }
     });
 
-    document.getElementById('repB2bTaxable').textContent = formatINR(b2bTotal);
-    document.getElementById('repB2bTax').textContent = formatINR(b2bTax);
-    document.getElementById('repB2cTaxable').textContent = formatINR(b2cTotal);
-    document.getElementById('repB2cTax').textContent = formatINR(b2cTax);
-    document.getElementById('repTotalTax').textContent = formatINR(b2bTax + b2cTax);
+    const setText = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    };
+    setText('repB2bTaxable', formatINR(b2bTotal));
+    setText('repB2bTax', formatINR(b2bTax));
+    setText('repB2cTaxable', formatINR(b2cTotal));
+    setText('repB2cTax', formatINR(b2cTax));
+    setText('repTotalTax', formatINR(b2bTax + b2cTax));
   }
 
   // Render Settings
@@ -490,9 +494,83 @@
     const pushBtn = document.getElementById('btnForceSync');
     if (pushBtn) {
       pushBtn.addEventListener('click', async () => {
+        if (!window.CloudSync.getUser || !window.CloudSync.getUser()) {
+          const modal = document.getElementById('authModal');
+          if (modal) modal.classList.add('active');
+          return;
+        }
         pushBtn.textContent = 'Syncing...';
         await window.CloudSync.pushToCloud();
         pushBtn.textContent = 'Sync Cloud';
+      });
+    }
+
+    // Firebase Auth UI
+    const authBtn = document.getElementById('btnAuthAction');
+    const authModal = document.getElementById('authModal');
+    const authErr = document.getElementById('authErrorMsg');
+    const googleBtn = document.getElementById('btnGoogleSignIn');
+    const emailForm = document.getElementById('emailAuthForm');
+
+    const updateAuthBtn = (user) => {
+      if (!authBtn) return;
+      if (user) {
+        authBtn.textContent = `Sign Out (${user.email ? user.email.split('@')[0] : 'Account'})`;
+        authBtn.title = user.email || 'Signed in';
+      } else {
+        authBtn.textContent = 'Sign In';
+        authBtn.title = 'Sign in for Firebase Cloud Sync';
+      }
+    };
+
+    if (window.CloudSync && window.CloudSync.onAuthChange) {
+      window.CloudSync.onAuthChange((user) => {
+        updateAuthBtn(user);
+        if (user && authModal) authModal.classList.remove('active');
+      });
+      updateAuthBtn(window.CloudSync.getUser ? window.CloudSync.getUser() : null);
+    }
+
+    if (authBtn) {
+      authBtn.addEventListener('click', async () => {
+        const user = window.CloudSync.getUser ? window.CloudSync.getUser() : null;
+        if (user) {
+          await window.CloudSync.signOut();
+          return;
+        }
+        if (authErr) authErr.style.display = 'none';
+        if (authModal) authModal.classList.add('active');
+      });
+    }
+
+    if (googleBtn) {
+      googleBtn.addEventListener('click', async () => {
+        if (authErr) authErr.style.display = 'none';
+        try {
+          await window.CloudSync.signInWithGoogle();
+        } catch (err) {
+          if (authErr) {
+            authErr.textContent = err.message || 'Google sign-in failed.';
+            authErr.style.display = 'block';
+          }
+        }
+      });
+    }
+
+    if (emailForm) {
+      emailForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (authErr) authErr.style.display = 'none';
+        const email = document.getElementById('authEmailInput')?.value.trim() || '';
+        const pass = document.getElementById('authPasswordInput')?.value || '';
+        try {
+          await window.CloudSync.signInWithEmail(email, pass);
+        } catch (err) {
+          if (authErr) {
+            authErr.textContent = err.message || 'Email sign-in failed.';
+            authErr.style.display = 'block';
+          }
+        }
       });
     }
   }

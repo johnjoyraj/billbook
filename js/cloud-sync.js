@@ -11,10 +11,38 @@
   const LOCAL_STORAGE_KEY = 'billbook_data_v1';
   const UPI_ID = 'joy.john@ybl';
   const UPI_RECIPIENT_NAME = 'Joy John';
+  const FIREBASE_CONFIG = {
+    apiKey: 'AIzaSyCDqiuu-mxG7jDrDt1CwFUhIe5kVpkaSSI',
+    authDomain: 'adonaibroadcast-11095.firebaseapp.com',
+    databaseURL: 'https://adonaibroadcast-11095.firebaseio.com',
+    projectId: 'adonaibroadcast-11095',
+    storageBucket: 'adonaibroadcast-11095.firebasestorage.app',
+    messagingSenderId: '701495282226',
+    appId: '1:701495282226:web:eb37af998fc93294f08a2b'
+  };
 
   let currentData = null;
   let isSyncing = false;
   let lastSyncTime = null;
+  let authListeners = [];
+
+  function getFirebaseAuth() {
+    if (!window.firebase) return null;
+    if (!window.firebase.apps.length) {
+      window.firebase.initializeApp(FIREBASE_CONFIG);
+    }
+    return window.firebase.auth ? window.firebase.auth() : null;
+  }
+
+  async function getAuthToken() {
+    const auth = getFirebaseAuth();
+    if (!auth || !auth.currentUser) return null;
+    try {
+      return await auth.currentUser.getIdToken();
+    } catch (e) {
+      return null;
+    }
+  }
 
   const CloudSync = {
     UPI_CONFIG: {
@@ -59,7 +87,19 @@
         }
       }
 
-      // 4. Attempt Firebase cloud fetch in background (non-blocking)
+      // 4. Initialize Firebase Auth listener & cloud sync if signed in
+      const auth = getFirebaseAuth();
+      if (auth) {
+        auth.onAuthStateChanged((user) => {
+          authListeners.forEach((cb) => cb(user));
+          if (user) {
+            this.syncFromCloud().catch(() => {});
+          } else {
+            this.updateSyncUI(true, 'Local Fast Cache');
+          }
+        });
+      }
+
       this.syncFromCloud().catch(err => {
         console.log('[CloudSync] Firebase sync in offline/standalone mode:', err.message);
       });
@@ -93,11 +133,16 @@
      */
     async pushToCloud() {
       if (!currentData) return false;
+      const token = await getAuthToken();
+      if (!token) {
+        this.updateSyncUI(true, 'Local Fast Cache (Sign in to sync)');
+        return false;
+      }
       isSyncing = true;
       this.updateSyncUI(true, 'Syncing to Cloud...');
 
       try {
-        const response = await fetch(`${FIREBASE_BASE_URL}.json`, {
+        const response = await fetch(`${FIREBASE_BASE_URL}.json?auth=${encodeURIComponent(token)}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
@@ -127,7 +172,12 @@
      */
     async syncFromCloud() {
       try {
-        const res = await fetch(`${FIREBASE_BASE_URL}.json?shallow=false`);
+        const token = await getAuthToken();
+        if (!token) {
+          this.updateSyncUI(true, 'Local Fast Cache');
+          return false;
+        }
+        const res = await fetch(`${FIREBASE_BASE_URL}.json?shallow=false&auth=${encodeURIComponent(token)}`);
         if (res.ok) {
           const cloudData = await res.json();
           if (cloudData && cloudData.business) {
@@ -143,6 +193,33 @@
       }
       this.updateSyncUI(true, 'Local Fast Cache');
       return false;
+    },
+
+    onAuthChange(cb) {
+      if (typeof cb === 'function') authListeners.push(cb);
+    },
+
+    getUser() {
+      const auth = getFirebaseAuth();
+      return auth ? auth.currentUser : null;
+    },
+
+    async signInWithGoogle() {
+      const auth = getFirebaseAuth();
+      if (!auth) throw new Error('Firebase Auth SDK not loaded');
+      const provider = new window.firebase.auth.GoogleAuthProvider();
+      return auth.signInWithPopup(provider);
+    },
+
+    async signInWithEmail(email, password) {
+      const auth = getFirebaseAuth();
+      if (!auth) throw new Error('Firebase Auth SDK not loaded');
+      return auth.signInWithEmailAndPassword(email, password);
+    },
+
+    async signOut() {
+      const auth = getFirebaseAuth();
+      if (auth) await auth.signOut();
     },
 
     /**

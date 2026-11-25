@@ -113,6 +113,7 @@
           <span id="cloudSyncText">Firebase Synced</span>
         </div>
         <button class="btn btn-outline btn-sm" id="btnForceSync">Sync Cloud</button>
+        <button class="btn btn-outline btn-sm" id="btnAuthAction">Sign In</button>
         <button class="btn btn-primary btn-sm" onclick="window.App.switchTab('pos')">⚡ Quick POS</button>
       </div>
     </header>
@@ -494,7 +495,29 @@
   </div>
 </div>
 
+<!-- Modal: Firebase Sign In -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-box" style="max-width: 420px;">
+    <div class="modal-header">
+      <h3>Sign In for Cloud Sync</h3>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body" style="display: flex; flex-direction: column; gap: 0.85rem;">
+      <button type="button" class="btn btn-primary" id="btnGoogleSignIn" style="width: 100%;">Continue with Google</button>
+      <div style="text-align: center; font-size: 0.8rem; color: #64748b;">or sign in with email &amp; password</div>
+      <form id="emailAuthForm" style="display: flex; flex-direction: column; gap: 0.65rem;">
+        <input type="email" id="authEmailInput" placeholder="Email address" required style="padding: 0.6rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 8px;" />
+        <input type="password" id="authPasswordInput" placeholder="Password" required style="padding: 0.6rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 8px;" />
+        <button type="submit" class="btn btn-outline" style="width: 100%;">Sign In with Email</button>
+      </form>
+      <div id="authErrorMsg" style="display: none; color: #dc2626; font-size: 0.84rem;"></div>
+    </div>
+  </div>
+</div>
+
 <!-- Scripts -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="js/seed-data.js"></script>
 <script src="js/cloud-sync.js"></script>
 <script src="js/app.js"></script>
