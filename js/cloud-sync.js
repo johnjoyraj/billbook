@@ -208,7 +208,14 @@
       const auth = getFirebaseAuth();
       if (!auth) throw new Error('Firebase Auth SDK not loaded');
       const provider = new window.firebase.auth.GoogleAuthProvider();
-      return auth.signInWithPopup(provider);
+      try {
+        return await auth.signInWithPopup(provider);
+      } catch (err) {
+        if (err && (err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment')) {
+          return auth.signInWithRedirect(provider);
+        }
+        throw err;
+      }
     },
 
     async signInWithEmail(email, password) {
